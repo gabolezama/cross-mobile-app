@@ -21,7 +21,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.opendevpro.crossmobileapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
