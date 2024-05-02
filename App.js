@@ -1,7 +1,7 @@
 import { StyleSheet} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Home from './src/Screens/Home';
+import Home from './src/Screens/Home/Home';
 import Login from './src/Screens/Login';
 import { getUserLocation, requestLocationPermission } from './src/utils/app-configurations';
 import { useEffect, useState } from 'react';
@@ -9,9 +9,7 @@ import { Provider } from 'react-redux';
 import store from './src/Store';
 const Stack = createStackNavigator();
 
-export default function App() {
-  const [permission, setPermission] = useState(null);
-  
+export default function App() {  
   useEffect(() => {
     executeConfig = async () =>{
       setPermission(await requestLocationPermission());
@@ -20,7 +18,6 @@ export default function App() {
     executeConfig();
   }, []);
 
-  console.log('PERMISSION: ', permission);
   return (
     <Provider store={store}>
       <NavigationContainer>

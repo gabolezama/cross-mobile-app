@@ -2,6 +2,7 @@ import { db } from "../../firebase-config";
 import * as Location from 'expo-location';
 import { setMyLocationAction } from "../Store/actions/generalActions";
 import store from "../Store";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 
 export const LOCATIONS_COLLECTION = "ubicaiones";
 
@@ -24,15 +25,15 @@ export const getUserLocation = async () =>{
     } 
 }
 
-export const saveUserLocation = async (location) =>{
+export const saveUserLocation = async (location, name) =>{
 
     if (location) {
       try {
-        const docRef = await addDoc(collection(db, LOCATIONS_COLLECTION), {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude
+        await setDoc(doc(db, LOCATIONS_COLLECTION, name), {
+          latitude: location.latitude,
+          longitude: location.longitude
         })
-        console.log("Document written with ID: ", docRef.id);
+        console.log("Document written with ID: ");
       } catch (error) {
         console.log("Error in adding a new document to DB", error);
       }
