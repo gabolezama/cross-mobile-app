@@ -1,8 +1,7 @@
 import { db } from "../../firebase-config";
 import * as Location from 'expo-location';
 import { setMyLocationAction } from "../Store/actions/generalActions";
-import store from "../Store";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
 
 export const LOCATIONS_COLLECTION = "ubicaiones";
 
@@ -19,10 +18,28 @@ export const requestLocationPermission = async () => {
 export const getUserLocation = async () =>{
     try {
         const {coords:{latitude, longitude}} = await Location.getCurrentPositionAsync({});
-        store.dispatch(setMyLocationAction({latitude, longitude}))
+        console.log('DATA: ', latitude, longitude);
+        return {latitude, longitude}
+        // store.dispatch(setMyLocationAction({latitude, longitude}))
     } catch (error) {
-        store.dispatch(setMyLocationAction({latitude: 0, longitude: 0}))
+      return null
+        // store.dispatch(setMyLocationAction({latitude: 0, longitude: 0}))
     } 
+}
+export const getCloserDrivers = async(lat) =>{
+  try {
+    const radius = 5;
+    const drivers = [];
+    const q = query(collection(db, "drivers"), where('latitude', '<=', lat));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      drivers.push({ [doc.id]: doc.data()})
+    });
+    console.log('EN SERVI: ', drivers);
+    return drivers;
+  } catch (error) {
+    console.log("Error al obtener los drivers cercanos: ", error);
+  }
 }
 
 export const saveUserLocation = async (location, name) =>{

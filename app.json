@@ -22,7 +22,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.opendevpro.crossmobileapp"
+      "package": "com.opendevpro.crossmobileapp",
+      "config":{
+        "googleMaps":{
+          "apiKey": "AIzaSyAm444c0u_NouSz5nNe1pQO8Rd2uuTrJzw"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
