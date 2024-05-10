@@ -1,12 +1,15 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
-import { getCloserDrivers, saveUserLocation } from '../../utils/app-configurations';
+import { getDriversInVisibleRegion, saveUserLocation } from '../../utils/app-configurations';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 import CarMarket from '../../Icons/CarMarket';
 import useHomeHook from './useHomeHook';
+import PersonMarker from '../../Icons/PersonMarker';
+import { Ionicons } from '@expo/vector-icons';
+import { styles } from './styles';
 
 export default function Home(props) {
   const navigation = useNavigation();
@@ -17,6 +20,7 @@ export default function Home(props) {
     markerLocations, setMarkerLocations,
     markerNames, setMarkerNames,
     errorMsg, setErrorMsg,
+    requestButton, onRequestButton,
     onRegionChangeComplete
   } = useHomeHook();
 
@@ -28,15 +32,22 @@ export default function Home(props) {
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
-      setStoredLocation(location.coords);
+      setStoredLocation({
+        [userName]: location.coords
+      });
     })();
   }, []);
 
   useEffect(()=>{
     if(storedLocation){
-      const {latitude, longitude} = storedLocation;
+      const {latitude, longitude} = storedLocation[userName];
       saveUserLocation({latitude, longitude}, userName);
-      getCloserDrivers(storedLocation.latitude)
+      getDriversInVisibleRegion({
+        latitude: storedLocation[userName].latitude,
+        longitude: storedLocation[userName].longitude,
+        latitudeDelta: 0.00222,
+        longitudeDelta: 0.00321,
+      })
       .then(res => setCloserDrivers(res));
     }
   },[storedLocation])
@@ -46,12 +57,7 @@ export default function Home(props) {
       
       const allMarkers = [
         ...closerDrivers, 
-        {
-          user:{
-            latitude: storedLocation.latitude,
-            longitude: storedLocation.longitude
-          }
-        }
+        storedLocation
       ];
       let markerLocations = [], markerNames = [];
         allMarkers.forEach( mkObj =>{
@@ -62,17 +68,17 @@ export default function Home(props) {
       setMarkerNames(markerNames);
     }
   }, [closerDrivers])
-  
     return (
       <View style={styles.container}>
+        
       {storedLocation && markerLocations? (
         <MapView
           style={styles.map}
           initialRegion={{
-            latitude: storedLocation.latitude,
-            longitude: storedLocation.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitude: storedLocation[userName].latitude,
+            longitude: storedLocation[userName].longitude,
+            latitudeDelta: 0.00222,
+            longitudeDelta: 0.00321,
           }}
           onRegionChangeComplete={onRegionChangeComplete}
         >
@@ -87,7 +93,7 @@ export default function Home(props) {
                 }}
                 title={markerNames[index]}
               >
-                <CarMarket/>
+                {markerNames[index] === 'user' ? <PersonMarker/> : <CarMarket/>}
               </Marker>
           )})
         }
@@ -95,19 +101,14 @@ export default function Home(props) {
       ) : (
         <Text>Cargando datos...</Text>
       )}
-
+      {requestButton && 
+        <>
+          <Text style={styles.reqButtonText}>Agenda tu viaje!</Text>
+          <TouchableOpacity style={styles.iconContainer} onPress={onRequestButton}>
+          <Ionicons name="add" size={35} color="white" />
+          </TouchableOpacity>
+        </>
+      }
     </View>
     );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  map: {
-    width: '100%',
-    height: '100%',
-  },
-});
