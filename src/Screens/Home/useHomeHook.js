@@ -1,6 +1,6 @@
 
 import { useState } from 'react'
-import { getDriversInVisibleRegion } from '../../utils/app-configurations';
+import { getDriversInVisibleRegion } from '../../utils/Gateways';
 
 export default function useHomeHook() {
     const [storedLocation, setStoredLocation] = useState(null);

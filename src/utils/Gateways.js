@@ -1,12 +1,13 @@
 import { db } from "../../firebase-config";
 import * as Location from 'expo-location';
-import { collection, doc, getDocs, query, setDoc, where, orderBy, collectionGroup } from 'firebase/firestore';
+import { collection, doc, getDocs, query, setDoc, where, orderBy } from 'firebase/firestore';
+import { decode } from '@mapbox/polyline';
 
 export const LOCATIONS_COLLECTION = "ubicaiones";
 
 export const requestLocationPermission = async () => {
     try {
-        let { status } = await Location.requestForegroundPermissionsAsync();  
+        let { status } = await Location.requestForegroundPermissionsAsync();
         return status
     } catch (error) {
         console.log('Error: request for location permissions');
@@ -17,13 +18,12 @@ export const requestLocationPermission = async () => {
 export const getUserLocation = async () =>{
     try {
         const {coords:{latitude, longitude}} = await Location.getCurrentPositionAsync({});
-        console.log('DATA: ', latitude, longitude);
         return {latitude, longitude}
         // store.dispatch(setMyLocationAction({latitude, longitude}))
     } catch (error) {
       return null
         // store.dispatch(setMyLocationAction({latitude: 0, longitude: 0}))
-    } 
+    }
 }
 
 export const getCloserDrivers = async(lat) =>{
@@ -62,7 +62,6 @@ export const getDriversInVisibleRegion = async (region) => {
             );
           const querySnapshot = await getDocs(q);
           querySnapshot.forEach(doc => {
-              console.log(doc.id, ' => ', doc.data());
               foundInWindow.push({
                   [doc.id]:{
                       ...doc.data()
@@ -74,7 +73,7 @@ export const getDriversInVisibleRegion = async (region) => {
   } catch (error) {
       console.log("Error al encontrar driver en el cambio de ventana: ", error);
   }
-  
+
 };
 
 export const saveUserLocation = async (location, name) =>{
@@ -92,3 +91,59 @@ export const saveUserLocation = async (location, name) =>{
         return
     }
 }
+
+export const getRoute = async (origin, destination) => {
+  const originCoords = `${origin.latitude},${origin.longitude}`;
+  const destinationCoords = `${destination.latitude},${destination.longitude}`;
+  const apiUrl = `https://routes.googleapis.com/directions/v2:computeRoutes`;
+  try {
+    const response = await fetch(apiUrl,{
+      method: 'POST',
+      headers:{
+        'Content-Type': 'aplication/json',
+        'X-Goog-Api-Key': 'API_KEY_GOOGLE_MAPS',
+        'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline'
+      },
+      body:JSON.stringify({
+        "origin":{
+          "location":{
+            "latLng":{
+              "latitude": origin.latitude,
+              "longitude": origin.longitude
+            }
+          }
+        },
+        "destination":{
+          "location":{
+            "latLng":{
+              "latitude": destination.latitude,
+              "longitude": destination.longitude
+            }
+          }
+        },
+        "travelMode": "DRIVE",
+        "routingPreference": "TRAFFIC_AWARE",
+        "departureTime": "2024-10-15T15:01:23.045123456Z",
+        "computeAlternativeRoutes": false,
+        "routeModifiers": {
+          "avoidTolls": false,
+          "avoidHighways": false,
+          "avoidFerries": false
+        },
+        "languageCode": "en-US",
+        "units": "IMPERIAL"
+      })
+    });
+    const data = await response.json();
+    const route = data.routes[0].polyline;
+    const decodedRoute = decode(route.encodedPolyline);
+    return decodedRoute.map(([latitude, longitude])=>{
+      return {
+        latitude,
+        longitude
+      }
+    });
+  } catch (error) {
+    console.error('Error in function (getRoute):', error);
+  }
+};

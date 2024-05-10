@@ -25,7 +25,7 @@
       "package": "com.opendevpro.crossmobileapp",
       "config":{
         "googleMaps":{
-          "apiKey": "AIzaSyAm444c0u_NouSz5nNe1pQO8Rd2uuTrJzw"
+          "apiKey": "API_KEY_GOOGLE_MAPS"
         }
       }
     },

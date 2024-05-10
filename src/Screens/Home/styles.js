@@ -24,7 +24,13 @@ export const styles = StyleSheet.create({
       padding: 5,
       backgroundColor: 'white'
     },
+    icon:{
+        fontSize: 50,
+        fontWeight: '800'
+    },
     iconContainer:{
+        justifyContent: 'center',
+        alignItems: 'center',
         position: 'absolute',
         bottom: 20,
         right: 20,
@@ -32,5 +38,13 @@ export const styles = StyleSheet.create({
         width: 80,
         height: 80,
         backgroundColor: '#6772EA'
-    }
+    },
+    buttonGetRoute: {
+      position: 'absolute',
+      bottom: 30,
+      zIndex: 20,
+      alignSelf: 'center',
+      alignItems: 'center',
+      padding: 10,
+    },
   });
