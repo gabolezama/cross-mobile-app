@@ -39,7 +39,7 @@ El stack tecnológico utilizado consta de lo siguiente:
 
 Inicio con la ubicación actual
 
-<img src="./assets/mapa-1-1.jpeg" alt="inicial" width="300">
+<img src="./assets/mapa-4.jpeg" alt="inicial" width="300">
 
 Al mover la ventana aparecen las opciones para agendar un viaje
 
@@ -47,11 +47,11 @@ Al mover la ventana aparecen las opciones para agendar un viaje
 
 Al clicar en el boton flotante aparecen las opciones disponibles
 
-<img src="./assets/mapa-3.jpeg" alt="opciones disponibles" width="300">
+<img src="./assets/mapa-2.jpeg" alt="opciones disponibles" width="300">
 
 Al clicar en 'get route' se dibuja una polylinea (por ahora está hardcodeada)
 
-<img src="./assets/mapa-4.jpeg" alt="dibujar polyline" width="300">
+<img src="./assets/mapa-1.jpeg" alt="dibujar polyline" width="300">
 
 Modal que emerge desde la parte inferior para ingresar la direccion destino (falta almacenarlo en el estado y agregarlo a la logica del polyline)
 
