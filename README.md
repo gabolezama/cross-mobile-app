@@ -36,7 +36,7 @@ El stack tecnológico utilizado consta de lo siguiente:
 ## Anexos
 
 Inicio con la ubicación actual
-![alt text](mapa-1-1.jpeg)
+![alt text](./assets/mapa-1-1.jpeg)
 
 Al mover la ventana aparecen las opciones para agendar un viaje
 ![alt text](mapa-2.jpeg)
