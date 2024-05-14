@@ -25,7 +25,7 @@ export const styles = StyleSheet.create({
       backgroundColor: 'white'
     },
     icon:{
-        fontSize: 50,
+        fontSize: 35,
         fontWeight: '800'
     },
     iconContainer:{

@@ -101,7 +101,7 @@ export const getRoute = async (origin, destination) => {
       method: 'POST',
       headers:{
         'Content-Type': 'aplication/json',
-        'X-Goog-Api-Key': 'API_KEY_GOOGLE_MAPS',
+        'X-Goog-Api-Key': 'AIzaSyAm444c0u_NouSz5nNe1pQO8Rd2uuTrJzw',
         'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline'
       },
       body:JSON.stringify({
@@ -147,3 +147,29 @@ export const getRoute = async (origin, destination) => {
     console.error('Error in function (getRoute):', error);
   }
 };
+
+export const getDestinationGeocoding = async (direction) =>{
+try {
+    if(!direction){
+      console.log('Error al intentar geocoding: Campo destino está vacío')
+      return
+    }
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(direction)}&key=AIzaSyAm444c0u_NouSz5nNe1pQO8Rd2uuTrJzw`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.status === 'OK') {
+      // Extraer las coordenadas de la respuesta
+      const latitude = data.results[0].geometry.location.lat;
+      const longitude = data.results[0].geometry.location.lng;
+      console.log(`Coordenadas de la dirección "${direction}":`);
+      console.log(`Latitud: ${latitude}`);
+      console.log(`Longitud: ${longitude}`);
+      return {
+        latitude,
+        longitude
+      }
+    }
+  } catch (error) {
+    throw new Error('Error al intentar geocoding: ', error)
+  }
+}

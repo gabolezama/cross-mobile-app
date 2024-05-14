@@ -24,4 +24,10 @@ export const styles = StyleSheet.create({
       borderColor: 'gray',
       borderRadius: 5,
     },
+    buttonsContainer:{
+      display: 'flex',
+      flexDirection: 'row',
+      alignContent: 'center',
+      justifyContent: 'space-between'
+    }
   });

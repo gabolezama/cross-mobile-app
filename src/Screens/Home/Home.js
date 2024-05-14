@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, TouchableOpacity, Button } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, Button, ActivityIndicator } from 'react-native'
+import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
-import { getDriversInVisibleRegion, getRoute, saveUserLocation } from '../../utils/Gateways';
+import { getDriversInVisibleRegion, saveUserLocation } from '../../utils/Gateways';
 import * as Location from 'expo-location';
 import MapView, { Marker, Polyline, } from 'react-native-maps';
 import CarMarket from '../../Icons/CarMarket';
@@ -15,17 +15,20 @@ import MapModal from '../../Components/MapModal/MapModal';
 export default function Home(props) {
   const navigation = useNavigation();
   const userName = useSelector( state => state.general.userName);
-  const [routeCoordinates, setRouteCoordinates] = useState(null)
-  const [showBelowModal, setShowBelowModal] = useState(false)
+  
   const {
+    isSearch,
+    routeCoordinates, setRouteCoordinates,
     storedLocation, setStoredLocation,
     closerDrivers, setCloserDrivers,
     markerLocations, setMarkerLocations,
     markerNames, setMarkerNames,
     errorMsg, setErrorMsg,
-    requestButton, onRequestButton,
+    showBelowModal, setShowBelowModal,
+    handleAddTravel,
+    onRequestButton,
     onRegionChangeComplete
-  } = useHomeHook();
+  } = useHomeHook(userName);
 
   useEffect(() => {
     (async () => {
@@ -71,16 +74,17 @@ export default function Home(props) {
       setMarkerNames(markerNames);
     }
   }, [closerDrivers])
-  const destination = {latitude: -34.5909087, longitude: -58.4352522}
     return (
       <View style={styles.container}>
-      <View style={styles.buttonGetRoute}>
-        <Button 
-        title="Get Route"
-        onPress={async() => setRouteCoordinates(await getRoute(storedLocation[userName], destination))} 
-        />
-      </View>  
+      
       {storedLocation && markerLocations? (
+        <>
+        <View style={styles.buttonGetRoute}>
+          <Button 
+            title="Clear Route"
+            onPress={() => setRouteCoordinates([])} 
+        />
+        </View>  
         <MapView
           style={styles.map}
           initialRegion={{
@@ -114,18 +118,23 @@ export default function Home(props) {
           )})
         }
         </MapView>
-      ) : (
-        <Text>Cargando datos...</Text>
-      )}
-      {requestButton && 
-        <>
-          <Text style={styles.reqButtonText}>Agenda tu viaje!</Text>
-          <TouchableOpacity style={styles.iconContainer} onPress={() =>{ setShowBelowModal(true); onRequestButton();}}>
-            <Ionicons name="add" color="white" style={styles.icon}/>
-          </TouchableOpacity>
+      
+        <Text style={styles.reqButtonText}>Agenda tu viaje!</Text>
+        <TouchableOpacity style={styles.iconContainer} onPress={() => isSearch? onRequestButton() : setShowBelowModal(true)}>
+          <Ionicons name={isSearch? "search-outline" : "add"} color="white" style={styles.icon}/>
+        </TouchableOpacity>
+        <MapModal 
+          visible={showBelowModal} 
+          onAccept={handleAddTravel}
+          onClose={() => setShowBelowModal(false)}
+        />
         </>
-      }
-      {showBelowModal&& <MapModal visible={showBelowModal} onClose={() => setShowBelowModal(false)}/>}
+      ): (
+        <>
+          <ActivityIndicator size={70} color="#0000ff" />
+          <Text>Cargando...</Text>
+        </>
+      )}
     </View>
     );
 }
