@@ -15,7 +15,6 @@ import MapModal from '../../Components/MapModal/MapModal';
 export default function Home(props) {
   const navigation = useNavigation();
   const userName = useSelector( state => state.general.userName);
-  
   const {
     isSearch,
     routeCoordinates, setRouteCoordinates,
@@ -38,11 +37,17 @@ export default function Home(props) {
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
-      setStoredLocation({
-        [userName]: location.coords
-      });
+      if(location)
+        setStoredLocation({
+          [userName]: location.coords
+        })
     })();
-  }, []);
+    if(props?.mockMarkers && props?.mockNames){
+      setMarkerLocations(props?.mockMarkers)
+      setMarkerNames(props?.mockMarkers)
+      setStoredLocation(props?.mockStoredLocation)
+    }
+  }, [markerLocations, markerNames]);
 
   useEffect(()=>{
     if(storedLocation){
@@ -74,6 +79,7 @@ export default function Home(props) {
       setMarkerNames(markerNames);
     }
   }, [closerDrivers])
+  
     return (
       <View style={styles.container}>
       
@@ -83,9 +89,10 @@ export default function Home(props) {
           <Button 
             title="Clear Route"
             onPress={() => setRouteCoordinates([])} 
-        />
+          />
         </View>  
         <MapView
+          testID='map-container'
           style={styles.map}
           initialRegion={{
             latitude: storedLocation[userName].latitude,

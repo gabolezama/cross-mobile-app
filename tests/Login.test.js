@@ -1,9 +1,10 @@
 import { render, screen } from "@testing-library/react-native"
 import Login from "../src/Screens/Login"
+import { NavigationContainer } from "@react-navigation/native";
 
 describe('Login Component Test', () => {
     test('Should have a user & password inputs', () => { 
-        render(<Login/>)
+        render(<Login/>, {wrapper: NavigationContainer})
         const userLabel = screen.getByRole('text', {name: /user/i})
         expect(userLabel).toBeDefined()
         const passwordLabel = screen.getByRole('text', {name: /password/i})
