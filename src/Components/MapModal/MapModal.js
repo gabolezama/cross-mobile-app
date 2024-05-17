@@ -1,21 +1,25 @@
 import { View, Modal, Button, TextInput, Text } from 'react-native'
 import React, { useState } from 'react'
 import { styles } from './styles';
-import { getDestinationGeocoding } from '../../utils/Gateways';
+import { getCoordinates } from '../../utils/Gateways';
+import { useSelector } from 'react-redux';
 
 export default function MapModal({
+  travelData,
   visible,
   onAccept,
-  onClose
+  onClose,
+  clearRoute
 }) {
+    const travelPrice = useSelector(state => state.general.settings.price)
     const [inputValue, setInputValue] = useState('');
     const handleInputChange = (text) => {
         setInputValue(text);
     };
     const handleAddButton = async () => {
-        onAccept(await getDestinationGeocoding(inputValue))
-        onClose()
+        onAccept(await getCoordinates(inputValue), inputValue)
     };
+  const isGetRouteOk = inputValue.length < 8 || !!travelData;
   return (
     <Modal
         animationType="slide"
@@ -32,9 +36,19 @@ export default function MapModal({
               value={inputValue}
               onChangeText={handleInputChange}
             />
+            { travelData &&
+              <View>
+                <Text>Información de tu viaje:</Text>
+                <Text>Distancia: {travelData.distanceMeters}m</Text>
+                <Text>Duracion: {travelData.duration}</Text>
+                <Text>Precio: {(travelData.distanceMeters*travelPrice)/500}</Text>
+                <Text>NOTA: Si deseas un nuevo viaje, debes cancelar este primero.</Text>
+              </View>
+            }
             <View style={styles.buttonsContainer}>
-              <Button title="Viajar!" onPress={handleAddButton} disabled={inputValue.length < 8}/>
-              <Button title="Cancelar" onPress={() => onClose()} />
+              <Button title="Viajar!" onPress={handleAddButton} disabled={isGetRouteOk}/>
+              <Button title="Ir al Mapa" onPress={() => onClose()} />
+              <Button title="Cancelar" onPress={clearRoute} disabled={!travelData}/>
             </View>
           </View>
         </View>

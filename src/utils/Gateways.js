@@ -1,9 +1,29 @@
+import 'react-native-get-random-values';
 import { db } from "../../firebase-config";
 import * as Location from 'expo-location';
-import { collection, doc, getDocs, query, setDoc, where, orderBy } from 'firebase/firestore';
+import { collection, doc, getDocs, query, setDoc, where, orderBy, deleteDoc, getDoc} from 'firebase/firestore';
 import { decode } from '@mapbox/polyline';
+import { v4 as uuidv4 } from 'uuid';
+import { Alert } from 'react-native';
 
 export const LOCATIONS_COLLECTION = "ubicaiones";
+export const TRAVELS_COLLECTION = "travels";
+export const SETTINGS_COLLECTION = "appSettings";
+
+export const getAppSettings = async () =>{
+  try {
+    const docRef = doc(db, SETTINGS_COLLECTION, "travels");
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      return docSnap.data();
+    } else {
+      console.log("No such document!");
+    }
+  } catch (error) {
+    console.log('Error on getting appSettings: ', error.message);
+  }
+}
 
 export const requestLocationPermission = async () => {
     try {
@@ -83,19 +103,47 @@ export const saveUserLocation = async (location, name) =>{
           latitude: location.latitude,
           longitude: location.longitude
         })
-        console.log("Documento creado/modificado: ", name);
+        console.log(`saveUserLocation: Documento creado/modificado --> ${name}`)
       } catch (error) {
-        console.log("Error in adding a new document to DB", error);
+        console.log(`Error in adding a new document to DB: ${LOCATIONS_COLLECTION}`, error);
       }
     }else{
-        return
+      console.log(`saveUserLocation: data location is missing`)
+    }
+  }
+
+export const saveTravelPolyline = async (polyline, storedLocation, destinationName, userName) =>{
+    if (polyline) {
+      try {
+        const travelId = uuidv4();
+        const origin = await Location.reverseGeocodeAsync({
+          latitude: storedLocation.latitude,
+          longitude: storedLocation.longitude
+        });
+        const {street, streetNumber} = origin[0];
+        await setDoc(doc(db, TRAVELS_COLLECTION, travelId), {
+          polyline,
+          isActive: false,
+          origin: `${street} ${streetNumber}`,
+          destination: destinationName,
+          userName
+        })
+        console.log(`saveTravelPolyline: Documento creado/modificado --> ${destinationName}`);
+      } catch (error) {
+        console.log(`Error in adding a new document to DB: ${TRAVELS_COLLECTION}`, error);
+      }
+    }else{
+      console.log(`saveTravelPolyline: data polyline is missing`)
     }
 }
 
 export const getRoute = async (origin, destination) => {
-  const originCoords = `${origin.latitude},${origin.longitude}`;
-  const destinationCoords = `${destination.latitude},${destination.longitude}`;
   const apiUrl = `https://routes.googleapis.com/directions/v2:computeRoutes`;
+  if(!origin || !destination){
+    Alert.alert('No se encontró el sitio indicado. Por favor, si puede, aporte mas información.');
+    console.log('(getRoute): destination/origin data is missing');
+    return
+  }
   try {
     const response = await fetch(apiUrl,{
       method: 'POST',
@@ -135,19 +183,68 @@ export const getRoute = async (origin, destination) => {
       })
     });
     const data = await response.json();
-    const route = data.routes[0].polyline;
-    const decodedRoute = decode(route.encodedPolyline);
-    return decodedRoute.map(([latitude, longitude])=>{
-      return {
-        latitude,
-        longitude
-      }
-    });
+    const {polyline, distanceMeters, duration} = data.routes[0];
+    const decodedRoute = decode(polyline.encodedPolyline);
+    const polylineCoords = 
+      decodedRoute.map(([latitude, longitude])=>{
+        return {
+          latitude,
+          longitude
+        }
+      });
+    return {
+      distanceMeters,
+      duration,
+      polylineCoords
+    }
   } catch (error) {
     console.error('Error in function (getRoute):', error);
   }
 };
 
+export const clearPolylineOnDB = async (userName) =>{
+  try {
+    const q = query(collection(db, TRAVELS_COLLECTION), where("userName", "==", userName));
+    const querySnapshot = await getDocs(q);
+    const docIds = [];
+    querySnapshot.forEach((doc) => {
+      docIds.push(doc.id);
+    });
+    
+    if(docIds.length > 0){
+      await deleteDoc(doc(db, TRAVELS_COLLECTION, docIds[0]))
+      console.log(`clearPolylineOnDB: Polylines for user ${userName} were succesfully erased`);
+    }
+    else
+      console.log(`clearPolylineOnDB: There aren't polylines for user: ${userName}`);
+  } catch (error) {
+    console.log(`clearPolylineOnDB: Error ${error}`);
+  }
+
+}
+
+// Geocoding con EXPO
+export const getCoordinates = async (address) => {
+  if (!address) {
+    console.log('(getCoordinates): address data is missing');
+    return null;
+  }
+  try {
+    const geocode = await Location.geocodeAsync(address);
+    if (geocode.length > 0) {
+      const {latitude, longitude} = geocode[0];
+      return {
+        latitude,
+        longitude
+      }
+    } else {
+      console.log('Not results found for this address');
+    }
+  } catch (error) {
+    console.log('Error on getting coodinates', error.message);
+  }
+};
+// Geocoding con API de google maps
 export const getDestinationGeocoding = async (direction) =>{
 try {
     if(!direction){

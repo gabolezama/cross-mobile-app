@@ -6,9 +6,18 @@ import Login from './src/Screens/Login';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Provider } from 'react-redux';
 import store from './src/Store';
+import { useEffect } from 'react';
+import { getAppSettings } from './src/utils/Gateways';
+import { setAppSettings } from './src/Store/actions/generalActions';
 const Stack = createStackNavigator();
 
 export default function App() {
+  useEffect(()=>{
+    (async() =>{
+      const settings = await getAppSettings();
+      store.dispatch(setAppSettings(settings))
+    })()
+  },[])
   return (
     <GestureHandlerRootView>
       <Provider store={store}>

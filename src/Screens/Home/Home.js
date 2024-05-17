@@ -16,7 +16,7 @@ export default function Home(props) {
   const navigation = useNavigation();
   const userName = useSelector( state => state.general.userName);
   const {
-    isSearch,
+    isSearch, travelData,
     routeCoordinates, setRouteCoordinates,
     storedLocation, setStoredLocation,
     closerDrivers, setCloserDrivers,
@@ -24,7 +24,7 @@ export default function Home(props) {
     markerNames, setMarkerNames,
     errorMsg, setErrorMsg,
     showBelowModal, setShowBelowModal,
-    handleAddTravel,
+    handleAddTravel, handleClearRoute,
     onRequestButton,
     onRegionChangeComplete
   } = useHomeHook(userName);
@@ -37,17 +37,11 @@ export default function Home(props) {
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
-      if(location)
-        setStoredLocation({
-          [userName]: location.coords
-        })
+      setStoredLocation({
+        [userName]: location.coords
+      })
     })();
-    if(props?.mockMarkers && props?.mockNames){
-      setMarkerLocations(props?.mockMarkers)
-      setMarkerNames(props?.mockMarkers)
-      setStoredLocation(props?.mockStoredLocation)
-    }
-  }, [markerLocations, markerNames]);
+  }, []);
 
   useEffect(()=>{
     if(storedLocation){
@@ -65,32 +59,25 @@ export default function Home(props) {
   
   useEffect(()=>{
     if(storedLocation && closerDrivers){
-      
       const allMarkers = [
         ...closerDrivers, 
         storedLocation
       ];
       let markerLocations = [], markerNames = [];
         allMarkers.forEach( mkObj =>{
-            markerLocations = [...markerLocations, ...Object.entries(mkObj).map(([key, value]) => value)];
-            markerNames = [... markerNames, ...Object.entries(mkObj).map(([key, value]) => key)]
+            markerLocations.push(...Object.entries(mkObj).map(([key, value]) => value));
+            markerNames.push(...Object.entries(mkObj).map(([key, value]) => key));
         })
       setMarkerLocations(markerLocations);
       setMarkerNames(markerNames);
     }
   }, [closerDrivers])
-  
+
     return (
       <View style={styles.container}>
       
       {storedLocation && markerLocations? (
         <>
-        <View style={styles.buttonGetRoute}>
-          <Button 
-            title="Clear Route"
-            onPress={() => setRouteCoordinates([])} 
-          />
-        </View>  
         <MapView
           testID='map-container'
           style={styles.map}
@@ -120,20 +107,22 @@ export default function Home(props) {
                 }}
                 title={markerNames[index]}
               >
-                {markerNames[index] === 'user' ? <PersonMarker/> : <CarMarket/>}
+                {isNaN(markerNames[index]) ? <PersonMarker/> : <CarMarket/>}
               </Marker>
           )})
         }
         </MapView>
       
         <Text style={styles.reqButtonText}>Agenda tu viaje!</Text>
-        <TouchableOpacity style={styles.iconContainer} onPress={() => isSearch? onRequestButton() : setShowBelowModal(true)}>
-          <Ionicons name={isSearch? "search-outline" : "add"} color="white" style={styles.icon}/>
+        <TouchableOpacity style={styles.iconContainer} onPress={() => isSearch && !travelData? onRequestButton() : setShowBelowModal(true)}>
+          <Ionicons name={isSearch && !travelData? "search-outline" : "add"} color="white" style={styles.icon}/>
         </TouchableOpacity>
-        <MapModal 
+        <MapModal
+          travelData={travelData} 
           visible={showBelowModal} 
           onAccept={handleAddTravel}
           onClose={() => setShowBelowModal(false)}
+          clearRoute={handleClearRoute}
         />
         </>
       ): (

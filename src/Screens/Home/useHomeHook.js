@@ -1,6 +1,6 @@
 
 import { useState } from 'react'
-import { getDriversInVisibleRegion, getRoute } from '../../utils/Gateways';
+import { saveTravelPolyline, getDriversInVisibleRegion, getRoute, clearPolylineOnDB } from '../../utils/Gateways';
 
 export default function useHomeHook(userName) {
     const [storedLocation, setStoredLocation] = useState(null);
@@ -13,6 +13,7 @@ export default function useHomeHook(userName) {
     const [isSearch, setIsSearch] = useState(false);
     const [showBelowModal, setShowBelowModal] = useState(false);
     const [routeCoordinates, setRouteCoordinates] = useState(null);
+    const [travelData, setTravelData] = useState(null);
 
     const onRegionChangeComplete = region => {
         setIsSearch(true);
@@ -23,14 +24,23 @@ export default function useHomeHook(userName) {
         setIsSearch(false);
         setCloserDrivers(await getDriversInVisibleRegion(visibleRegion));
     }
-
-    const handleAddTravel = async (destination) =>{
-        setDestination(destination)
-        setRouteCoordinates(await getRoute(storedLocation[userName], destination))
+    const handleClearRoute= async () => {
+        clearPolylineOnDB(userName);
+        setRouteCoordinates([]);
+        setTravelData(null)
     }
 
+    const handleAddTravel = async (destination, destinationName) =>{
+        const travelData = await getRoute(storedLocation[userName], destination);
+        setDestination(destination)
+        if(travelData){
+            setRouteCoordinates(travelData.polylineCoords)
+            saveTravelPolyline(travelData.polylineCoords, storedLocation[userName], destinationName, userName)
+            setTravelData(travelData)
+        }
+    }
     return {
-        destination, 
+        destination, travelData,
         routeCoordinates, setRouteCoordinates,
         storedLocation, setStoredLocation,
         closerDrivers, setCloserDrivers,
@@ -39,7 +49,7 @@ export default function useHomeHook(userName) {
         errorMsg, setErrorMsg,
         isSearch, setIsSearch,
         showBelowModal, setShowBelowModal,
-        handleAddTravel,
+        handleAddTravel, handleClearRoute,
         onRequestButton,
         onRegionChangeComplete
     }
