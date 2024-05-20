@@ -10,6 +10,9 @@ import { useEffect } from 'react';
 import { getAppSettings } from './src/utils/Gateways';
 import { setAppSettings } from './src/Store/actions/generalActions';
 import Registration from './src/Screens/Registration/Registration';
+import { STACK } from './src/utils/Constants';
+import { CustomToast } from './src/Components/CustomTast/CustomToast';
+import Toast from 'react-native-toast-message';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -28,23 +31,14 @@ export default function App() {
               options={{
                 headerShown: false
               }} 
-              name="Login" 
+              name={STACK.login} 
               component={Login} 
             />
-            <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen name="Registration" component={Registration} />
+            <Stack.Screen name={STACK.home} component={Home} />
+            <Stack.Screen name={STACK.registration} component={Registration} />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>
     </GestureHandlerRootView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

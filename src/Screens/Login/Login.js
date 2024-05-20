@@ -6,28 +6,28 @@ import { useDispatch } from 'react-redux';
 import { setMyNameAction } from '../../Store/actions/generalActions';
 import { styles } from './styles';
 import { loginRequest } from '../../utils/FirestoreService';
+import Toast from 'react-native-toast-message';
+import FormError from '../../Components/FormError/FormError';
 
 export default function Login() {
   const [loginData, setLoginData] = useState({});
+  const [showLoginError, setShowLoginError] = useState();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const handleTextInput = (text, tag) =>{
+    showLoginError && setShowLoginError(null)
     setLoginData({
       ...loginData,
       [tag]: text
     })
   }
   const handleLogin = async() =>{
-    const isAnyFieldEmpty = !['email', 'password'].every(key => Object.keys(loginData).includes(key));
-    if(isAnyFieldEmpty){
-      Alert.alert('Todos los campos son requeridos!!');
-      return;
-    }
-    const loginStatus = await loginRequest(loginData.email, loginData.password)
-    console.log('LOGINSTATUS: ', loginStatus);
-    if(loginStatus){
+    const loginStatus = await loginRequest(loginData.email, loginData.password);
+    if(typeof loginStatus === 'boolean'){
       dispatch(setMyNameAction(loginData?.email));
       navigation.navigate('Home');
+    }else{
+      setShowLoginError(loginStatus)
     }
   }
   const handleRegistration = () =>{
@@ -44,6 +44,7 @@ export default function Login() {
         <Text style={styles.text}>Contraseña</Text>
         <TextInput style={styles.input} onChangeText={(text)=>handleTextInput(text, 'password')} placeholder='Password'/>
       </View>
+      { showLoginError && <FormError message={showLoginError}/> }
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text>Entrar</Text>
       </TouchableOpacity>

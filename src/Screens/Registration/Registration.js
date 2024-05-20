@@ -4,30 +4,44 @@ import { styles } from './styles'
 import {newUserRegistration} from "../../utils/FirestoreService"
 import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
+import { CustomToast } from '../../Components/CustomTast/CustomToast';
 
 export default function Registration() {
-    const [loginData, setLoginData] = useState({});
+    const [registrationData, setRegistrationData] = useState({});
     const navigation = useNavigation();
     const handleTextInput = (text, tag) =>{
-        setLoginData({
-          ...loginData,
+        setRegistrationData({
+          ...registrationData,
           [tag]: text
         })
     }
-    const formFields = ['name', 'phone', 'document', 'password'];
-    const formFieldLabels = ['Nombre Completo', 'Numero de Telefono', 'Numero de Documento', 'Contraseña'];
-    const handleRegistration = () =>{
-        const isAnyFieldEmpty = !formFields.every(key => Object.keys(loginData).includes(key));
+    const formFields = ['name', 'email', 'phone', 'document', 'password'];
+    const formFieldLabels = ['Nombre Completo', 'Email', 'Numero de Telefono', 'Numero de Documento', 'Contraseña'];
+    const handleRegistration = async() =>{
+        const isAnyFieldEmpty = !formFields.every(key => Object.keys(registrationData).includes(key));
         if(isAnyFieldEmpty){
-            Alert.alert('Todos los campos son requeridos!!');
+            Toast.show({
+                type: 'info',
+                text1: 'Registro:',
+                text2: 'Todos los campos son requeridos!',
+            });
             return;
         }
-        const registrationStatus = newUserRegistration(loginData.name, loginData.password)
-        if(registrationStatus){
-            Alert.alert('Usuario Registrado Exitosamente!');
+        const registrationStatus = await newUserRegistration(registrationData, navigation)
+        if(typeof registrationStatus === 'boolean'){
+            Toast.show({
+                type: 'success',
+                text1: 'Registro:',
+                text2: 'Usuario registrado exitosamente.',
+            });
             navigation.navigate('Login')
         }else{
-
+            Toast.show({
+                type: 'error',
+                text1: 'Registro:',
+                text2: `${registrationStatus}`,
+            });
         }
     }
   return (
@@ -36,8 +50,7 @@ export default function Registration() {
         formFields.map((field, index)=>(
             <View key={field} style={styles.inputContainer}>
                 <Text style={styles.text}>{formFieldLabels[index]}</Text>
-                <TextInput 
-                    value={loginData[field]} 
+                <TextInput
                     style={styles.input} 
                     onChangeText={(text)=>handleTextInput(text, `${field}`)} 
                 />
@@ -50,6 +63,7 @@ export default function Registration() {
       <TouchableOpacity style={styles.loginButton}>
         <Text>Cancelar</Text>
       </TouchableOpacity>
+      <Toast />
     </View>
   )
 }
