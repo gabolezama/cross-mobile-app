@@ -1,16 +1,17 @@
 export const SET_MY_LOCATION = 'SET_MY_LOCATION';
-export const SET_USER_NAME = 'SET_USER_NAME';
+export const SET_USER_INFO = 'SET_USER_INFO';
 export const SET_APP_SETTINGS= 'SET_APP_SETTINGS';
 
 const initialState = {
-    userName: 'Freddy Lezama',
     myLocation: {
         latitude: 0,
         longitude: 0
     },
     settings:{
         price: 0
-    }
+    },
+    userInfo:{},
+    isAlReadyLogged: false
 }
 
 export default (state = initialState, { type, payload }) => {
@@ -25,10 +26,10 @@ export default (state = initialState, { type, payload }) => {
             }
         }
 
-    case SET_USER_NAME:
+    case SET_USER_INFO:
         return { 
             ...state,
-            userName: payload.name
+            userInfo: payload
         }
 
     case SET_APP_SETTINGS:

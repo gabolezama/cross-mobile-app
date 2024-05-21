@@ -14,7 +14,7 @@ import MapModal from '../../Components/MapModal/MapModal';
 
 export default function Home(props) {
   const navigation = useNavigation();
-  const userName = useSelector( state => state.general.userName);
+  const userName = useSelector(state => state.general.userInfo.name);
   const {
     isSearch, travelData,
     routeCoordinates, setRouteCoordinates,

@@ -1,18 +1,16 @@
-import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native'
-import React, { useState } from 'react'
-import { COMPONENT_TEST_IDS } from '../../utils/Constants'
+import { View, Text, TextInput, TouchableOpacity } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { COMPONENT_TEST_IDS, STACK } from '../../utils/Constants'
 import { useNavigation } from '@react-navigation/native'
-import { useDispatch } from 'react-redux';
-import { setMyNameAction } from '../../Store/actions/generalActions';
 import { styles } from './styles';
 import { loginRequest } from '../../utils/FirestoreService';
-import Toast from 'react-native-toast-message';
 import FormError from '../../Components/FormError/FormError';
+import { auth } from '../../../firebase-config';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 export default function Login() {
   const [loginData, setLoginData] = useState({});
   const [showLoginError, setShowLoginError] = useState();
-  const dispatch = useDispatch();
   const navigation = useNavigation();
   const handleTextInput = (text, tag) =>{
     showLoginError && setShowLoginError(null)
@@ -22,20 +20,18 @@ export default function Login() {
     })
   }
   const handleLogin = async() =>{
-    const loginStatus = await loginRequest(loginData.email, loginData.password);
+    const loginStatus = await loginRequest(loginData);
     if(typeof loginStatus === 'boolean'){
-      dispatch(setMyNameAction(loginData?.email));
-      navigation.navigate('Home');
+      navigation.navigate(STACK.home);
     }else{
       setShowLoginError(loginStatus)
     }
   }
   const handleRegistration = () =>{
-    navigation.navigate('Registration');
+    navigation.navigate(STACK.registration);
   }
   return (
     <View testID={COMPONENT_TEST_IDS.login} style={styles.container}>
-      {/* <Image style={styles.image} source={require("../../../assets/vehicle-logo.jpg")}/> */}
       <View style={styles.inputContainer}>
         <Text style={styles.text}>Email</Text>
         <TextInput style={styles.input} onChangeText={(text)=>handleTextInput(text, 'email')} placeholder='Email'/>

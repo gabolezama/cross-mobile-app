@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Alert } from 'react-native';
 
 export const LOCATIONS_COLLECTION = "ubicaiones";
+export const USERS_COLLECTION = "usersInfo";
 export const TRAVELS_COLLECTION = "travels";
 export const SETTINGS_COLLECTION = "appSettings";
 

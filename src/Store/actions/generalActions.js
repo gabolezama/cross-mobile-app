@@ -1,4 +1,4 @@
-import { SET_APP_SETTINGS, SET_MY_LOCATION, SET_USER_NAME } from "../reducers/generalReducer"
+import { SET_APP_SETTINGS, SET_MY_LOCATION, SET_USER_INFO } from "../reducers/generalReducer"
 
 export const setMyLocationAction = (location) =>{
     return {
@@ -10,11 +10,11 @@ export const setMyLocationAction = (location) =>{
     }
 }
 
-export const setMyNameAction = (name) =>{
+export const setUserInfo = (data) =>{
     return {
-        type: SET_USER_NAME,
+        type: SET_USER_INFO,
         payload: {
-            name
+            ...data
         }
     }
 }

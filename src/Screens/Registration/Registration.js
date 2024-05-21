@@ -2,10 +2,8 @@ import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { styles } from './styles'
 import {newUserRegistration} from "../../utils/FirestoreService"
-import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
-import { CustomToast } from '../../Components/CustomTast/CustomToast';
 
 export default function Registration() {
     const [registrationData, setRegistrationData] = useState({});
@@ -21,27 +19,15 @@ export default function Registration() {
     const handleRegistration = async() =>{
         const isAnyFieldEmpty = !formFields.every(key => Object.keys(registrationData).includes(key));
         if(isAnyFieldEmpty){
-            Toast.show({
-                type: 'info',
-                text1: 'Registro:',
-                text2: 'Todos los campos son requeridos!',
-            });
+            Toast.show({type: 'info', text1: 'Registro:', text2: 'Todos los campos son requeridos!'});
             return;
         }
         const registrationStatus = await newUserRegistration(registrationData, navigation)
         if(typeof registrationStatus === 'boolean'){
-            Toast.show({
-                type: 'success',
-                text1: 'Registro:',
-                text2: 'Usuario registrado exitosamente.',
-            });
+            Toast.show({type: 'success', text1: 'Registro:', text2: 'Usuario registrado exitosamente.'});
             navigation.navigate('Login')
         }else{
-            Toast.show({
-                type: 'error',
-                text1: 'Registro:',
-                text2: `${registrationStatus}`,
-            });
+            Toast.show({type: 'error',text1: 'Registro:', text2: `${registrationStatus}`});
         }
     }
   return (
