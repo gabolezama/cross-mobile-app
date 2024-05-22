@@ -9,6 +9,7 @@ export default function Registration() {
     const [registrationData, setRegistrationData] = useState({});
     const navigation = useNavigation();
     const handleTextInput = (text, tag) =>{
+      if(tag === 'email') text = text.toLowerCase();
         setRegistrationData({
           ...registrationData,
           [tag]: text

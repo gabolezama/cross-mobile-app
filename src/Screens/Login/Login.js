@@ -1,12 +1,10 @@
 import { View, Text, TextInput, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { COMPONENT_TEST_IDS, STACK } from '../../utils/Constants'
 import { useNavigation } from '@react-navigation/native'
 import { styles } from './styles';
 import { loginRequest } from '../../utils/FirestoreService';
 import FormError from '../../Components/FormError/FormError';
-import { auth } from '../../../firebase-config';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 export default function Login() {
   const [loginData, setLoginData] = useState({});
@@ -20,6 +18,7 @@ export default function Login() {
     })
   }
   const handleLogin = async() =>{
+    setLoginData({email: '', password: ''})
     const loginStatus = await loginRequest(loginData);
     if(typeof loginStatus === 'boolean'){
       navigation.navigate(STACK.home);
@@ -34,7 +33,7 @@ export default function Login() {
     <View testID={COMPONENT_TEST_IDS.login} style={styles.container}>
       <View style={styles.inputContainer}>
         <Text style={styles.text}>Email</Text>
-        <TextInput style={styles.input} onChangeText={(text)=>handleTextInput(text, 'email')} placeholder='Email'/>
+        <TextInput on style={styles.input} onChangeText={(text)=>handleTextInput(text.toLowerCase(), 'email')} placeholder='Email'/>
       </View>
       <View style={styles.inputContainer}>
         <Text style={styles.text}>Contraseña</Text>

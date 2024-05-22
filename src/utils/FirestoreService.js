@@ -1,7 +1,7 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth, db } from "../../firebase-config";
-import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
-import { USERS_COLLECTION } from "./Gateways";
+import { collection, deleteDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { SESSIONS_COLLECTION, USERS_COLLECTION } from "./Gateways";
 import store from "../Store/index"
 import {setUserInfo} from "../Store/actions/generalActions"
 
@@ -22,7 +22,6 @@ export const newUserRegistration = async (data, navigation) =>{
         const errorType = ['credential', 'email', 'password', 'document'].find(item =>{
             return error.message.includes(item)
         }) 
-        console.log('ERROR-T: ', errorType);
         switch(errorType){
             case 'email':
                 return 'Este email ya ha sido registrado anteriormente';
@@ -38,28 +37,56 @@ export const newUserRegistration = async (data, navigation) =>{
 
 export const loginRequest = async(data) =>{
     try {
+        if(!data){
+            throw new Error('data-required')
+        }
         const users = await getDocumentFromFirebase(USERS_COLLECTION, 'email', data.email)
-        console.log('IN LOGIN: ', users);
         if(users){
             store.dispatch(setUserInfo(users[0]));
             const login = await signInWithEmailAndPassword(auth, data.email, data.password)
-            return true
+            const sessions = await getDocumentFromFirebase(SESSIONS_COLLECTION, 'email', data.email)
+            if(sessions.length > 0){
+                throw new Error('user-has-an-active-session')
+            }else{
+                await saveToFirebaseCollection(SESSIONS_COLLECTION, data.email,{
+                        email: data.email,
+                        token: login._tokenResponse.idToken})
+                return true
+            }
         }
     } catch (error) {
-        console.log(`(loginRequest ): Error attepting to login: ${error.message}`);
-        const errorType = ['credential', 'email', 'password'].find(item =>{
+        console.log(`(loginRequest): Error attepting to login: ${error.message}`);
+        const errorType = ['credential', 'email', 'password', 'session', 'network', 'user', 'data']
+        .find(item =>{
             return error.message.includes(item)
         })
         switch(errorType){
+            case 'data':
+                return 'Los campos son requeridos.';
             case 'credential':
                 return 'Credenciales Iválidas!';
             case 'email':
                 return 'Email está vacío';
             case 'password':
                 return 'Contraseña está vacío';
+            case 'session':
+                return 'El usuario ya tiene una sesion activa';
+            case 'network':
+                return 'No hay conexión de red';
             default:
                 return 'No se pudo procesar login';
         }
+    }
+}
+
+export const logoutRequest = async () =>{
+    try {
+        const email = store.getState().general.userInfo.email
+        await deleteDoc(doc(db, SESSIONS_COLLECTION, email))
+        const logout = await signOut(auth);
+        console.log(`Logout successful!`);
+    } catch (error) {
+        console.log(`(logoutRequest): Error attempting to logout ${error.message}`);
     }
 }
 
@@ -82,4 +109,14 @@ const getDocumentFromFirebase = async (searchCollection, criteria, data) =>{
         response.push({...doc.data()})
     });
     return response
+}
+
+const saveToFirebaseCollection = async(collection, name, data) =>{
+    try {
+        await setDoc(doc(db, collection, name), {
+            ...data
+        })
+    } catch (error) {
+        console.log(`Error on saving data to collection ${collection}`);
+    }
 }

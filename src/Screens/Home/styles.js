@@ -47,4 +47,11 @@ export const styles = StyleSheet.create({
       alignItems: 'center',
       padding: 10,
     },
+    logoutContainer:{
+      position: 'absolute',
+      top: 50,
+      right: 20
+    },
+    logout:{
+    }
   });

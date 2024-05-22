@@ -31,7 +31,11 @@ export default function App() {
               name={STACK.login} 
               component={Login} 
             />
-            <Stack.Screen name={STACK.home} component={Home} />
+            <Stack.Screen 
+
+              name={STACK.home} 
+              component={Home} 
+            />
             <Stack.Screen name={STACK.registration} component={Registration} />
           </Stack.Navigator>
         </NavigationContainer>

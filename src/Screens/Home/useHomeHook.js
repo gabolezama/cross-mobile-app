@@ -1,6 +1,9 @@
 
 import { useState } from 'react'
 import { saveTravelPolyline, getDriversInVisibleRegion, getRoute, clearPolylineOnDB } from '../../utils/Gateways';
+import { useNavigation } from '@react-navigation/native';
+import { STACK } from '../../utils/Constants';
+import { logoutRequest } from '../../utils/FirestoreService';
 
 export default function useHomeHook(userName) {
     const [storedLocation, setStoredLocation] = useState(null);
@@ -14,7 +17,7 @@ export default function useHomeHook(userName) {
     const [showBelowModal, setShowBelowModal] = useState(false);
     const [routeCoordinates, setRouteCoordinates] = useState(null);
     const [travelData, setTravelData] = useState(null);
-
+    const navigation = useNavigation();
     const onRegionChangeComplete = region => {
         setIsSearch(true);
         setVisibleRegion(region);
@@ -39,6 +42,10 @@ export default function useHomeHook(userName) {
             setTravelData(travelData)
         }
     }
+    const handleLogout = async () =>{
+        await logoutRequest();
+        navigation.navigate(STACK.login)
+    }
     return {
         destination, travelData,
         routeCoordinates, setRouteCoordinates,
@@ -50,7 +57,7 @@ export default function useHomeHook(userName) {
         isSearch, setIsSearch,
         showBelowModal, setShowBelowModal,
         handleAddTravel, handleClearRoute,
-        onRequestButton,
+        onRequestButton, handleLogout,
         onRegionChangeComplete
     }
 }

@@ -25,7 +25,7 @@ export default function Home(props) {
     errorMsg, setErrorMsg,
     showBelowModal, setShowBelowModal,
     handleAddTravel, handleClearRoute,
-    onRequestButton,
+    onRequestButton, handleLogout,
     onRegionChangeComplete
   } = useHomeHook(userName);
 
@@ -124,6 +124,9 @@ export default function Home(props) {
           onClose={() => setShowBelowModal(false)}
           clearRoute={handleClearRoute}
         />
+        <TouchableOpacity style={styles.logoutContainer} onPress={handleLogout}>
+          <Ionicons name={"log-out"} color="black" size={40} style={styles.logout}/>
+        </TouchableOpacity>
         </>
       ): (
         <>
