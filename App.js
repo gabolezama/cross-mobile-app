@@ -10,6 +10,7 @@ import { getAppSettings } from './src/utils/Gateways';
 import { setAppSettings } from './src/Store/actions/generalActions';
 import Registration from './src/Screens/Registration/Registration';
 import { STACK } from './src/utils/Constants';
+import PasswordRecover from './src/Screens/Recover/PasswordRecover';
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -32,11 +33,11 @@ export default function App() {
               component={Login} 
             />
             <Stack.Screen 
-
               name={STACK.home} 
               component={Home} 
             />
             <Stack.Screen name={STACK.registration} component={Registration} />
+            <Stack.Screen name={STACK.passwordRecover} component={PasswordRecover} />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>

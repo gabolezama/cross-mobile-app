@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth, db } from "../../firebase-config";
 import { collection, deleteDoc, doc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { SESSIONS_COLLECTION, USERS_COLLECTION } from "./Gateways";
@@ -87,6 +87,28 @@ export const logoutRequest = async () =>{
         console.log(`Logout successful!`);
     } catch (error) {
         console.log(`(logoutRequest): Error attempting to logout ${error.message}`);
+    }
+}
+
+export const sendMailToRecoverPassword = async (email) =>{
+    try {
+        const actionCodeSettings = {
+            url: `https://www.example.com/?email=${email}`,
+            iOS: {
+               bundleId: 'com.opendevpro.ios'
+            },
+            android: {
+              packageName: "com.opendevpro.crossmobileapp",
+              installApp: true,
+              minimumVersion: '12'
+            },
+            handleCodeInApp: true
+          };
+        console.log('holiwis', email);
+        const resp = await sendPasswordResetEmail(auth, email, actionCodeSettings)
+        console.log('SEND MAIL: ', resp);
+    } catch (error) {
+        console.log(`Error on attempting to send mail to recover password: ${error.message}`);
     }
 }
 

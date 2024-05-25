@@ -5,5 +5,6 @@ export const COMPONENT_TEST_IDS = {
 export const STACK = {
     login: 'Login',
     home: 'Home',
-    registration: 'Registration'
+    registration: 'Registration',
+    passwordRecover: 'Recover'
 }

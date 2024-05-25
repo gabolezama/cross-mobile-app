@@ -29,17 +29,5 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10
-    },
-    image: {
-        width: '50%',
-        height: '50%',
-        resizeMode: 'cover', // Puedes cambiarlo a 'contain', 'stretch', etc. según necesites
-    },
-    registrationText:{
-        color: 'blue',
-        textDecorationLine: 'underline'
-    },
-    textContainer:{
-        marginVertical: 15
     }
 })

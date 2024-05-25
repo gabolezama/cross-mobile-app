@@ -29,6 +29,9 @@ export default function Login() {
   const handleRegistration = () =>{
     navigation.navigate(STACK.registration);
   }
+  const handlePasswordRecover = () =>{
+    navigation.navigate(STACK.passwordRecover)
+  }
   return (
     <View testID={COMPONENT_TEST_IDS.login} style={styles.container}>
       <View style={styles.inputContainer}>
@@ -43,7 +46,8 @@ export default function Login() {
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text>Entrar</Text>
       </TouchableOpacity>
-      <Text>Eres nuevo en la app? <Text style={styles.registrationText} onPress={handleRegistration}>REGISTRATE</Text></Text>
+      <Text style={styles.textContainer}>Eres nuevo en la app? <Text style={styles.registrationText} onPress={handleRegistration}>REGISTRATE</Text></Text>
+      <Text>Olvidaste tu contraseña? <Text style={styles.registrationText} onPress={handlePasswordRecover}>haz click acá</Text></Text>
     </View>
   )
 }
