@@ -11,11 +11,16 @@ import { setAppSettings } from './src/Store/actions/generalActions';
 import Registration from './src/Screens/Registration/Registration';
 import { STACK } from './src/utils/Constants';
 import PasswordRecover from './src/Screens/Recover/PasswordRecover';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 const Stack = createStackNavigator();
+const configGoogleSignIn = () => {
+  GoogleSignin.configure();
+};
 
 export default function App() {
   useEffect(()=>{
     (async() =>{
+      configGoogleSignIn();
       const settings = await getAppSettings();
       store.dispatch(setAppSettings(settings));
     })()

@@ -1,5 +1,6 @@
 {
   "expo": {
+    "schema": "com.opendevpro.crossmobileapp",
     "name": "cross-mobile-app",
     "slug": "cross-mobile-app",
     "version": "1.0.0",
@@ -15,7 +16,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.opendevpro.crossmobileapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,14 +25,20 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.opendevpro.crossmobileapp",
-      "config":{
-        "googleMaps":{
+      "config": {
+        "googleMaps": {
           "apiKey": "AIzaSyAm444c0u_NouSz5nNe1pQO8Rd2uuTrJzw"
         }
       }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "da66da1a-fad4-42c5-a694-80ec543a8fd9"
+      }
+    },
+    "owner": "opendevpro"
   }
 }

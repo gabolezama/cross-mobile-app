@@ -30,6 +30,12 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius: 10
     },
+    googleButton:{
+        width: '50%',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+    },
     image: {
         width: '50%',
         height: '50%',
