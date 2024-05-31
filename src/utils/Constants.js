@@ -8,3 +8,15 @@ export const STACK = {
     registration: 'Registration',
     passwordRecover: 'Recover'
 }
+
+export const LOGIN_ERROR_VALIDATIONS = [
+    'credential',
+    'wrong',
+    'invalid',
+    'email',
+    'password',
+    'session',
+    'network',
+    'user',
+    'data'
+]

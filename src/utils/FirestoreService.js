@@ -4,6 +4,7 @@ import { collection, deleteDoc, doc, getDocs, query, setDoc, where } from "fireb
 import { SESSIONS_COLLECTION, USERS_COLLECTION } from "./Gateways";
 import store from "../Store/index"
 import {setUserInfo} from "../Store/actions/generalActions"
+import { LOGIN_ERROR_VALIDATIONS } from "./Constants";
 
 export const newUserRegistration = async (data, navigation) =>{
     try {
@@ -45,6 +46,7 @@ export const loginRequest = async(data) =>{
             store.dispatch(setUserInfo(users[0]));
             const login = await signInWithEmailAndPassword(auth, data.email, data.password)
             const sessions = await getDocumentFromFirebase(SESSIONS_COLLECTION, 'email', data.email)
+            console.log('SESSION: ', sessions);
             if(sessions.length > 0){
                 throw new Error('user-has-an-active-session')
             }else{
@@ -56,10 +58,11 @@ export const loginRequest = async(data) =>{
         }
     } catch (error) {
         console.log(`(loginRequest): Error attepting to login: ${error.message}`);
-        const errorType = ['credential', 'email', 'password', 'session', 'network', 'user', 'data']
+        const errorType = LOGIN_ERROR_VALIDATIONS
         .find(item =>{
             return error.message.includes(item)
         })
+        console.log('ERROR: ', errorType);
         switch(errorType){
             case 'data':
                 return 'Los campos son requeridos.';
@@ -67,12 +70,18 @@ export const loginRequest = async(data) =>{
                 return 'Credenciales Iválidas!';
             case 'email':
                 return 'Email está vacío';
+            case 'invalid':
+                return 'Email inválido';
             case 'password':
                 return 'Contraseña está vacío';
+            case 'wrong':
+                return 'Contraseña inválida';
             case 'session':
                 return 'El usuario ya tiene una sesion activa';
             case 'network':
                 return 'No hay conexión de red';
+            case 'user':
+                return 'El usuario no existe';
             default:
                 return 'No se pudo procesar login';
         }

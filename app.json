@@ -1,6 +1,6 @@
 {
   "expo": {
-    "schema": "com.opendevpro.crossmobileapp",
+    "scheme": "com.opendevpro.crossmobileapp",
     "name": "cross-mobile-app",
     "slug": "cross-mobile-app",
     "version": "1.0.0",
@@ -36,9 +36,8 @@
     },
     "extra": {
       "eas": {
-        "projectId": "da66da1a-fad4-42c5-a694-80ec543a8fd9"
+        "projectId": "379b12f8-78ae-4fc9-9ccc-e62bbbf97829"
       }
-    },
-    "owner": "opendevpro"
+    }
   }
 }

@@ -18,8 +18,8 @@ export default function Login() {
     androidClientId,
   });
   useEffect(()=>{
+    console.log('SUCCESS: ', response);
     if (response?.type === "success") {
-      console.log('SUCCESS: ', response);
     }
     if (response?.type === "error") {
       console.log('Error: ', response);
