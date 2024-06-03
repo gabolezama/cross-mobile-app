@@ -5,6 +5,7 @@ import { SESSIONS_COLLECTION, USERS_COLLECTION } from "./Gateways";
 import store from "../Store/index"
 import {setUserInfo} from "../Store/actions/generalActions"
 import { LOGIN_ERROR_VALIDATIONS } from "./Constants";
+import { loginErrorHandler } from "./ErrorHandler";
 
 export const newUserRegistration = async (data, navigation) =>{
     try {
@@ -46,7 +47,6 @@ export const loginRequest = async(data) =>{
             store.dispatch(setUserInfo(users[0]));
             const login = await signInWithEmailAndPassword(auth, data.email, data.password)
             const sessions = await getDocumentFromFirebase(SESSIONS_COLLECTION, 'email', data.email)
-            console.log('SESSION: ', sessions);
             if(sessions.length > 0){
                 throw new Error('user-has-an-active-session')
             }else{
@@ -58,33 +58,33 @@ export const loginRequest = async(data) =>{
         }
     } catch (error) {
         console.log(`(loginRequest): Error attepting to login: ${error.message}`);
-        const errorType = LOGIN_ERROR_VALIDATIONS
-        .find(item =>{
-            return error.message.includes(item)
-        })
-        console.log('ERROR: ', errorType);
-        switch(errorType){
-            case 'data':
-                return 'Los campos son requeridos.';
-            case 'credential':
-                return 'Credenciales Iválidas!';
-            case 'email':
-                return 'Email está vacío';
-            case 'invalid':
-                return 'Email inválido';
-            case 'password':
-                return 'Contraseña está vacío';
-            case 'wrong':
-                return 'Contraseña inválida';
-            case 'session':
-                return 'El usuario ya tiene una sesion activa';
-            case 'network':
-                return 'No hay conexión de red';
-            case 'user':
-                return 'El usuario no existe';
-            default:
-                return 'No se pudo procesar login';
+        return loginErrorHandler(error)
+    }
+}
+export const googleLogin = async (token) =>{
+    try {
+        const googleData = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await googleData.json()
+        const users = await getDocumentFromFirebase(USERS_COLLECTION, 'email', data.email)
+        if(users){
+            store.dispatch(setUserInfo(users[0]));
+            const sessions = await getDocumentFromFirebase(SESSIONS_COLLECTION, 'email', data.email)
+            if(sessions.length > 0){
+                throw new Error('user-has-an-active-session')
+            }else{
+                await saveToFirebaseCollection(SESSIONS_COLLECTION, data.email,{
+                        email: data.email,
+                        token})
+                return true
+            }
+        }else{
+            throw new Error('user-doesnt-exist')
         }
+    } catch (error) {
+        console.log(`(googleLogin): Error attepting to login: ${error.message}`);
+        return loginErrorHandler(error);
     }
 }
 
@@ -101,21 +101,7 @@ export const logoutRequest = async () =>{
 
 export const sendMailToRecoverPassword = async (email) =>{
     try {
-        const actionCodeSettings = {
-            url: `https://www.example.com/?email=${email}`,
-            iOS: {
-               bundleId: 'com.opendevpro.ios'
-            },
-            android: {
-              packageName: "com.opendevpro.crossmobileapp",
-              installApp: true,
-              minimumVersion: '12'
-            },
-            handleCodeInApp: true
-          };
-        console.log('holiwis', email);
-        const resp = await sendPasswordResetEmail(auth, email, actionCodeSettings)
-        console.log('SEND MAIL: ', resp);
+        await sendPasswordResetEmail(auth, email)
     } catch (error) {
         console.log(`Error on attempting to send mail to recover password: ${error.message}`);
     }

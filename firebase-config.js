@@ -2,17 +2,26 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { cfg } from "./environment.config";
+const {
+  FIRESTORE_API_KEY,
+  AUTH_DOMAIN,
+  PROJECT_ID,
+  STORAGE_BUCKET,
+  MSG_SENDER_ID,
+  APP_ID
+} = cfg;
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCfei2u8lP_bkbbcVjNUDXTA5H765sasts",
-  authDomain: "cross-mobile-app.firebaseapp.com",
-  projectId: "cross-mobile-app",
-  storageBucket: "cross-mobile-app.appspot.com",
-  messagingSenderId: "24885664838",
-  appId: "1:24885664838:web:5a0709b5a1daba685efe47"
+  apiKey: FIRESTORE_API_KEY,
+  authDomain: AUTH_DOMAIN,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MSG_SENDER_ID,
+  appId: APP_ID
 };
 
 // Initialize Firebase

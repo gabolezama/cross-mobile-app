@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { COMPONENT_TEST_IDS, STACK } from '../../utils/Constants'
 import { useNavigation } from '@react-navigation/native'
 import { styles } from './styles';
-import { loginRequest } from '../../utils/FirestoreService';
+import { googleLogin, loginRequest } from '../../utils/FirestoreService';
 import FormError from '../../Components/FormError/FormError';
 import { Ionicons } from '@expo/vector-icons';
 import * as Google from 'expo-auth-session/providers/google';
@@ -18,11 +18,17 @@ export default function Login() {
     androidClientId,
   });
   useEffect(()=>{
-    console.log('SUCCESS: ', response);
-    if (response?.type === "success") {
+    if (response?.type === "success" && response.authentication.accessToken) {
+      googleLogin(response.authentication.accessToken).then(res => {
+        if(typeof res === 'boolean'){
+          navigation.navigate(STACK.home);
+        }else{
+          setShowLoginError(res)
+        }
+      });
     }
-    if (response?.type === "error") {
-      console.log('Error: ', response);
+    else if (response?.type === "error") {
+      console.log('Error on prompting Google Login: ', error.message);
     }
   },[response])
   const handleTextInput = (text, tag) =>{

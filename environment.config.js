@@ -1,0 +1,8 @@
+export const cfg = {
+    FIRESTORE_API_KEY: process.env.EXPO_PUBLIC_FIRESTORE_API_KEY,
+    AUTH_DOMAIN: process.env.EXPO_PUBLIC_AUTH_DOMAIN,
+    PROJECT_ID: process.env.EXPO_PUBLIC_PROJECT_ID,
+    STORAGE_BUCKET: process.env.EXPO_PUBLIC_STORAGE_BUCKET,
+    MSG_SENDER_ID: process.env.EXPO_PUBLIC_MSG_SENDER_ID,
+    APP_ID: process.env.EXPO_PUBLIC_APP_ID
+}
