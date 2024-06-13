@@ -253,7 +253,7 @@ try {
       console.log('Error al intentar geocoding: Campo destino está vacío')
       return
     }
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(direction)}&key=AIzaSyAm444c0u_NouSz5nNe1pQO8Rd2uuTrJzw`;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(direction)}&key=${process.env.EXPO_PUBLIC_API_KEY}`;
     const response = await fetch(url);
     const data = await response.json();
     if (data.status === 'OK') {
